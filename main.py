@@ -31,7 +31,7 @@ for i in file.readline().split():  # цикл проходящий через ч
     if a < 2048:  # проверяет является ли число меньше 2048
         secondDigit = int(i[1], 16)  # содержит вторую цифру числа переведя его из 16 в 10 систему счисления
         quantityOfDigitsInNumber = len(str(int(i, 16)))  # содержит общее количество цифр числа переведя его из 16 в 10
-        if quantityOfDigitsInNumber < secondDigit:  # проверяет является ли общее количество цифр цисла больше
+        if quantityOfDigitsInNumber > secondDigit:  # проверяет является ли общее количество цифр цисла больше
             # его второй цифры
             if i[-1] in even:  # проверяет является ли число четным
                 desiredDigits.append(i)  # числа удовлетворяющиt условиям
