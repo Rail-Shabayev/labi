@@ -4,8 +4,17 @@
 # Вывести числа и их количество. Максимальное число вывести прописью.
 import os
 import sys
-import num2words
 
+number_dict = {0: 'ноль',
+               1: 'один',
+               2: 'два',
+               3: 'три',
+               4: 'четыре',
+               5: 'пять',
+               6: 'шесть',
+               7: 'семь',
+               8: 'восемь',
+               9: 'девять'}
 desiredDigits = []  # переменная которая будет содержать подходящие по условиям числа
 quantityOfDigits = 0  # переменная которая будет содержать общее количество подходящих условиям чисел
 even = ("0", "2", "4", "6", "8", "A", "C", "E")  # четные числа в 16-ой системе счисления
@@ -31,8 +40,11 @@ if quantityOfDigits != 0:
     print("цифры походящие по условиям: " + str(desiredDigits))
     print("количство цифр подходящих по условиям: " + str(quantityOfDigits))
     max_number = max(desiredDigits)
-    max_number_in_russian = num2words.num2words(int(max_number, 16), lang='ru')
-    print("максимальное число из тех чисел, которые подходят по условиям: " + max_number_in_russian)
+    max_number_in_russian = int(max_number, 16)
+    message = ""
+    for i in str(max_number_in_russian):
+        message += number_dict.get(int(i)) + " "
+    print("максимальное число из тех чисел, которые подходят по условиям: " + message)
 
 else:
     print("чисел удовлетворяющих условиям нету")
