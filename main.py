@@ -31,26 +31,19 @@ if re.match("0", str(size)):
     print("файл является пустым")
     sys.exit()
 for i in file.readline().split():
-    if re.match("^0", i[0]):
-        print("Число " + i + " начинается с 0")
-        continue
-    if re.match(r'(0x)?[A-Fa-f0-9]+', i) is False:
-        print("Число записано не в 16-ой системе счисления")
-    if int(i, 16) < 2048:
-        sec = i[1]
-        qty = str(len(i))
-        if (re.match("[012]", str(sec)) and re.match("3", qty) or
-                re.match("[012]", str(sec)) and re.match("3", qty)):
-            if re.match("^[0-9A-Fa-f]*[24680ACE]$", i):
+    if re.match("^[0-9A-Fa-f]*[24680ACE]$", i):
+        if int(i, 16) < 2048:
+            sec = i[1]
+            qty = len(i)
+            if re.match("[12]", str(qty-int(sec))):
                 desiredDigits.append(i)
                 quantityOfDigits += 1
             else:
-                print("16-ое число: " + str(i) + " - число не четное")
+                print("16-ое число: " + str(i) + " - количество цифр меньше второго числа")
         else:
-            print("16-ое число: " + str(i) + " - количество цифр меньше второго числа")
+            print("16-ое число: " + str(i) + " - больше 2048 в десятичной системе")
     else:
-        print("16-ое число: " + str(i) + " - больше 2048 в десятичной системе")
-
+        print("16-ое число: " + str(i) + " - число не четное")
 if quantityOfDigits != 0:
     print("цифры походящие по условиям: " + str(desiredDigits))
     print("количство цифр подходящих по условиям: " + str(quantityOfDigits))
