@@ -1,16 +1,51 @@
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+""" Формируется матрица F следующим образом: если в Е сумма чисел по периметру области 1 больше, 
+чем количество нулей по периметру области 4, то поменять в С симметрично области 1 и 3 местами, 
+иначе В и Е поменять местами несимметрично. При этом матрица А не меняется. После чего вычисляется 
+выражение:((К*AT)*А)-K*FT . Выводятся по мере формирования А, F и все матричные операции последовательно."""
+from random import randint as rnd
 
+def printList(z):
+    for i in z:
+        for j in i:
+            print("{:4}".format(j), end=' ')
+        print()
+    print()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+k, n = int(input("k = ")), int(input("n = "))
+m = n//2
+n = m*2
+a = []
 
+for i in range(n):
+    a.append([])
+    for j in range(n):
+        a[i].append(rnd(-10,10))
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+print("Matrix A : ")
+printList(a)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+b = []
+c = []
+d = []
+e = []
+for i in range(m):
+    b.append([])
+    c.append([])
+    d.append([])
+    e.append([])
+    for j in range(m):
+        b[i].append(a[i+m][j+m])
+        c[i].append(a[i+m][j])
+        d[i].append(a[i][j])
+        e[i].append(a[i][j+m])
+
+print("Matrix B : ")
+printList(b)
+print("Matrix C : ")
+printList(c)
+print("Matrix D : ")
+printList(d)
+print("Matrix E : ")
+printList(e)
+
