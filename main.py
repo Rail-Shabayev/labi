@@ -1,63 +1,145 @@
-# Вариант 27.
-# Шеснадцатиричные четные числа, не превышающие 2048 и
-# содержащие количество цифр большее, чем вторая цифра числа.
-# Вывести числа и их количество. Максимальное число вывести прописью.
-import os
-import sys
+"""
+Задана рекуррентная функция. Область определения функции – натуральные числа.
+ Написать программу сравнительного вычисления данной функции рекурсивно и итерационно.
+  Определить границы применимости рекурсивного и итерационного подхода.
+   Результаты сравнительного исследования времени вычисления представить в табличной и графической форме в виде отчета по лабораторной работе.
+27.	F(1) = 1; G(1) = 1; F(n) = (-1)n*(F(n–1) – 2*G(n–1)), G(n) = F(n–1) /(2n)! + G(n–1), при n >=2"""
 
-number_dict = {'0': 'ноль',
-               '1': 'один',
-               '2': 'два',
-               '3': 'три',
-               '4': 'четыре',
-               '5': 'пять',
-               '6': 'шесть',
-               '7': 'семь',
-               '8': 'восемь',
-               '9': 'девять',
-               'A': 'A',
-               'B': 'B',
-               'C': 'C',
-               'D': 'D',
-               'E': 'E',
-               'F': 'F'}
-desiredDigits = []
-quantityOfDigits = 0
-even = ("0", "2", "4", "6", "8", "A", "C", "E")
-file = open("text.txt", "r")
-if os.stat("text.txt").st_size == 0:
-    print("файл является пустым")
-    sys.exit()
-for i in file.readline().split():
-    if i[0] == "0":
-        print("Число " + i + " начинается с 0")
-        continue
-    try:
-        a = int(i, 16)
-    except ValueError as error:
-        print(error)
-        print("Число записано не в 16-ой системе счисления")
-    if a < 2048:
-        secondDigit = i[1]
-        quantityOfDigitsInNumber = str(len(i))
-        if quantityOfDigitsInNumber > secondDigit:
-            if i[-1].upper() in even:
-                desiredDigits.append(i)
-                quantityOfDigits += 1
-            else:
-                print("16-ое число: " + str(i) + " - kисло не четное")
-        else:
-            print("16-ое число: " + str(i) + " - kоличество цифр меньше второго числа")
+import time
+import matplotlib.pyplot as plt
+from functools import lru_cache
+
+"""n это переменная для значения n"""
+n = -1
+"""one это переменная для определения знака"""
+one = 1
+"""k это переменная для выбора режима работы"""
+k = -1
+"""списки для замера времени"""
+timer = []
+timer_rec = []
+"""ans это переменная для ответа пользователя """
+ans = 1
+"""шаг графика"""
+step = -1
+
+"""рекурсия"""
+
+
+@lru_cache(maxsize=None)
+def factrial(x):
+    if x == 1:
+        return x
     else:
-        print("16-ое число: " + str(i) + " - больше 2048 в десятичной системе")
+        return x * factrial(x - 1)
 
-if quantityOfDigits != 0:
-    print("цифры походящие по условиям: " + str(desiredDigits))
-    print("количство цифр подходящих по условиям: " + str(quantityOfDigits))
-    max_number = max(desiredDigits)
-    message = ""
-    for i in str(max_number):
-        message += number_dict.get(i.upper()) + " "
-    print("максимальное число из тех чисел, которые подходят по условиям: " + message)
-else:
-    print("чисел удовлетворяющих условиям нет")
+
+def rec_f(x, one):
+    if x < 2:
+
+        return 1
+    else:
+        one *= -1
+        return one * (rec_f(x - 1, one) - (2 * rec_g(x - 1, one)))
+
+
+def rec_g(x, one):
+    if x < 2:
+        return 1
+    else:
+
+        return ((rec_f(x - 1, one) / factrial(2 * x)) + rec_g(x - 1, one))
+
+
+"""итерация"""
+
+
+def it_f(x):
+    cata_f = [1] * 3
+    cata_g = [1] * 3
+    one = 1
+    for i in range(2, x + 1):
+        cata_g[1] = cata_f[0] / it_factorial(2 * i) + cata_g[0]
+        cata_f[-1] = one * (cata_f[1] - (2 * cata_g[1]))
+        cata_f[0], cata_f[1] = cata_f[1], cata_f[2]
+        cata_g[0], cata_g[1] = cata_g[1], cata_g[2]
+        one *= -1
+
+    return cata_f[-1]
+
+
+@lru_cache(maxsize=None)
+def it_factorial(x):
+    res = x
+    for i in range(1, x):
+        res = res * (i + 1)
+    return res
+
+
+"""ввод числа n"""
+while n < 1:
+    print("Введите натуральное число от 1 ")
+    n = int(input())
+while step < 1:
+    step = int(input("Введите шаг графика от 1"))
+graf = list(range(1, n + 1, step))
+
+"""выбор режима работы программы 0-рекурсия 1-итерация 2-оба"""
+while k != 0 and k != 1 and k != 2:
+    print("Выберите режим работы 0-рекурсия 1-итерация 2-оба")
+    k = int(input())
+
+if (n >= 33 and (k == 0 or k == 2)) or (n >= 5000 and (k == 1 or k == 2)):
+    print("работа программы может занять большое время ,вы хотите продолжить? \n 1=да 0=нет")
+    ans = int(input())
+
+    while ans != 1 and ans != 0:
+        print("работа программы может занять большое время ,вы хотите продолжить? \n 1=да 0=нет")
+        ans = int(input())
+
+if k == 0 and ans == 1:
+    for i in graf:
+        start = time.time()
+        res = rec_f(i, one)
+        end = time.time()
+        timer.append(end - start)
+        rec_times = end - start
+        print(i, "№Результат рекурсии ", res, "\nВремя выполнения", end - start, "\n\n")
+    """графики"""
+    plt.plot(graf, timer, label='рекурсионная функция.')
+    plt.legend(loc=2)
+
+if k == 1 and ans == 1:
+    for i in graf:
+        start = time.time()
+        result = it_f(i)
+        end = time.time()
+        timer.append(end - start)
+        iter_times = end - start
+        print(i, "№Результат рекурсии ", result, "\nВремя выполнения", end - start, "\n\n")
+    """графики"""
+    plt.plot(graf, timer, label='Итерационная функция.')
+    plt.legend(loc=2)
+
+if k == 2 and ans == 1:
+    for i in graf:
+        start = time.time()
+        result = it_f(i)
+        end = time.time()
+        timer.append(end - start)
+        start_rec = time.time()
+        res = rec_f(i, one)
+        end_rec = time.time()
+        timer_rec.append(end_rec - start_rec)
+        rec_times = end_rec - start_rec
+        iter_times = end - start
+        print("\n", i, "№результат рекурсии ", res, "---------результат итерации", result,
+              "-----------время  РЕКУРСИИ ", end_rec - start_rec, "-------время  ИТЕРАЦИИ", end - start)
+    """графики"""
+    plt.plot(graf, timer, label='Итерационная функция.')
+    plt.plot(graf, timer_rec, label='Рекусионная функция.')
+    plt.legend(loc=2)
+
+plt.xlabel('Значение n')
+plt.ylabel('Время выполнения (c)')
+plt.show()
