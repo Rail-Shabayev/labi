@@ -4,29 +4,30 @@
 Определить границы применимости рекурсивного и итерационного подхода.
 Результаты сравнительного исследования времени вычисления представить в табличной и
 графической форме в виде отчета по лабораторной работе.
-27.	F(1) = 1; G(1) = 1; F(n) = (-1)n*(F(n–1) – 2*G(n–1)),
-G(n) = F(n–1) /(2n)! + G(n–1), при n >=2
+27.	F(1) = 1;
+G(1) = 1;
+F(n) = (-1)n*(F(n–1) – 2*G(n–1)),
+G(n) = F(n–1) /(2n)! + G(n–1),
+при n >=2
 """
 import time
 import matplotlib.pyplot as plt
-from functools import lru_cache
 
-n = -1
+n = 4
 
 timer_iter = []
 timer_rec = []
 
+cache = {0: 0, 1: 1}
+
 one = -1
 fp = 2
 
-lru_cache(maxsize=None)
 
-
-def factorial(f):
-    global fp
-    fp *= f
-    fp *= f - 1
-    return fp
+def factorial(n):
+    if n not in cache:
+        cache[n] = n * factorial(n - 1)
+    return cache[n]
 
 
 def recursive(x):
@@ -60,14 +61,13 @@ while n < 1:
 graf = list(range(2, n + 1))
 
 for i in graf:
-    start = time.time()
     one, fp = 1, 2
+    start = time.time()
     result = iterative(i)
     end = time.time()
     timer_iter.append(end - start)
 
     start_rec = time.time()
-    one, fp = 1, 2
     res = recursive(i)[0]
     end_rec = time.time()
     timer_rec.append(end_rec - start_rec)
