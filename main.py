@@ -1,63 +1,122 @@
-# Вариант 27.
-# Шеснадцатиричные четные числа, не превышающие 2048 и
-# содержащие количество цифр большее, чем вторая цифра числа.
-# Вывести числа и их количество. Максимальное число вывести прописью.
-import os
-import sys
+import tkinter as tk
+from tkinter import messagebox
+import random
 
-number_dict = {'0': 'ноль',
-               '1': 'один',
-               '2': 'два',
-               '3': 'три',
-               '4': 'четыре',
-               '5': 'пять',
-               '6': 'шесть',
-               '7': 'семь',
-               '8': 'восемь',
-               '9': 'девять',
-               'A': 'A',
-               'B': 'B',
-               'C': 'C',
-               'D': 'D',
-               'E': 'E',
-               'F': 'F'}
-desiredDigits = []
-quantityOfDigits = 0
-even = ("0", "2", "4", "6", "8", "A", "C", "E")
-file = open("text.txt", "r")
-if os.stat("text.txt").st_size == 0:
-    print("файл является пустым")
-    sys.exit()
-for i in file.readline().split():
-    if i[0] == "0":
-        print("Число " + i + " начинается с 0")
-        continue
-    try:
-        a = int(i, 16)
-    except ValueError as error:
-        print(error)
-        print("Число записано не в 16-ой системе счисления")
-    if a < 2048:
-        secondDigit = i[1]
-        quantityOfDigitsInNumber = str(len(i))
-        if quantityOfDigitsInNumber > secondDigit:
-            if i[-1].upper() in even:
-                desiredDigits.append(i)
-                quantityOfDigits += 1
-            else:
-                print("16-ое число: " + str(i) + " - kисло не четное")
-        else:
-            print("16-ое число: " + str(i) + " - kоличество цифр меньше второго числа")
+# Пустое игровое поле
+board = [' ' for _ in range(9)]
+player = 'X'
+computer = 'О'
+
+# Все выигрышные комбинации
+winning_combinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+]
+
+
+# Проверка всех возможных комбинаций
+def is_winner(board, player):
+    return any(all(board[i] == player for i in combination)
+        for combination in winning_combinations)
+
+
+# Проверка заполнения поля
+def is_board_full(board):
+    return ' ' not in board
+
+
+# Обработка ходов пользователя и компьютера
+def make_move(move):
+    if board[move] != ' ':
+        return
+    board[move] = player
+    buttons[move].config(text=player)
+    if is_winner(board, player):
+        highlight_winning_combination(player, 'green')
+        messagebox.showinfo('Победа!', 'Вы победили!')
+        reset_game()
+    elif is_board_full(board):
+        highlight_draw()
+        messagebox.showwarning('Ничья!', 'Вы сыграли вничью!')
+        reset_game()
     else:
-        print("16-ое число: " + str(i) + " - больше 2048 в десятичной системе")
+        computer_move = get_computer_move()
+        if computer_move is not None:
+            board[computer_move] = computer
+            buttons[computer_move].config(text=computer)
+            if is_winner(board, computer):
+                highlight_winning_combination(computer, 'red')
+                messagebox.showerror('Поражение!', 'Компьютер победил!')
+                reset_game()
 
-if quantityOfDigits != 0:
-    print("цифры походящие по условиям: " + str(desiredDigits))
-    print("количство цифр подходящих по условиям: " + str(quantityOfDigits))
-    max_number = max(desiredDigits)
-    message = ""
-    for i in str(max_number):
-        message += number_dict.get(i.upper()) + " "
-    print("максимальное число из тех чисел, которые подходят по условиям: " + message)
-else:
-    print("чисел удовлетворяющих условиям нет")
+
+# Ходы компьютера
+def get_computer_move():
+    possible_moves = [i for i, x in enumerate(board) if x == ' ']
+    for move in possible_moves:
+        board_copy = board[:]
+        board_copy[move] = computer
+        if is_winner(board_copy, computer):
+            return move
+    for move in possible_moves:
+        board_copy = board[:]
+        board_copy[move] = player
+        if is_winner(board_copy, player):
+            return move
+    corners = [0, 2, 6, 8]  # углы
+    available_corners = [corner for corner in corners if corner in possible_moves]
+    if available_corners:
+        return random.choice(available_corners)
+    if 4 in possible_moves:
+        return 4
+    edges = [1, 3, 5, 7]  # края
+    available_edges = [edge for edge in edges if edge in possible_moves]
+    if available_edges:
+        return random.choice(available_edges)
+    return None
+
+
+# Сброс игры после окончания ходов
+def reset_game():
+    global board
+    board = [' ' for _ in range(9)]
+    for button in buttons:
+        button.config(text=' ', bg='Azure3')
+
+
+# Вывод цвета на выигрышной комбинации
+def highlight_winning_combination(player, color):
+    for combination in winning_combinations:
+        if all(board[i] == player for i in combination):
+            for index in combination:
+                buttons[index].config(bg=color)
+            break
+
+
+# Вывод желтого поля при ничье
+def highlight_draw():
+    for button in buttons:
+        button.config(bg='yellow')
+
+
+window = tk.Tk()
+window.resizable(False, False)
+buttons = []
+x = (window.winfo_screenwidth() - window.winfo_reqwidth()) / 2
+y = (window.winfo_screenheight() - window.winfo_reqheight()) / 2
+window.wm_geometry("+%d+%d" % (x, y))
+
+# Кнопки игрового поля
+for i in range(9):
+    button = tk.Button(window, text=' ', bg='Azure3', font=('Arial', 20), width=4, height=2,
+                       command=lambda move=i: make_move(move))
+    button.grid(row=i // 3, column=i % 3)
+    buttons.append(button)
+
+window.mainloop()
